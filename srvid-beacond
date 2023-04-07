@@ -19,7 +19,9 @@ import json
 class Handler_class(BaseHTTPRequestHandler):
 	def do_GET(self):
 		## HEADERS ##
-		self.send_response(200)
+		self.send_response_only(200)
+		self.send_header("Server", "srvid-beacon v" + srvid_beacon_version)
+		self.send_header("Date", self.date_time_string())
 		self.send_header("Content-type", "application/json; charset=utf-8")
 		self.end_headers()
 		
