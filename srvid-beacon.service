@@ -1,0 +1,19 @@
+[Unit]
+Description=Pingable http endpoint for monitoring server uptime
+
+After=network.target
+
+
+
+[Service]
+User=srvid-beacon
+Group=srvid-beacon
+
+ExecStart=/opt/srvid-beacon/srvid-beacond
+
+Restart=on-failure
+
+
+
+[Install]
+WantedBy=multi-user.target
