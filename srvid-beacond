@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+# srvid-beacon v3.0.0 | (c) tjdev.de 2023 | www.tjdev.de
+srvid_beacon_version = "3.0.0"
+
+
+## IMPORTS ##
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import socket
+import json
+
+
+
+
+
+#################################
+# R E Q U E S T   H A N D L E R #
+#################################
+
+class Handler_class(BaseHTTPRequestHandler):
+	def do_GET(self):
+		## HEADERS ##
+		self.send_response(200)
+		self.send_header("Content-type", "application/json; charset=utf-8")
+		self.end_headers()
+		
+		
+		## BODY ##
+		# get hostname
+		hostname = socket.gethostname()
+		
+		# build data object
+		data = {
+			"hostname": hostname
+		}
+		
+		# encode json response
+		json_string = json.dumps({
+			"version": srvid_beacon_version,
+			"type": "success",
+			"data": data
+		});
+		
+		# respond
+		self.wfile.write(bytes(json_string, "utf-8"))
+
+
+
+
+
+#########################
+# I P V 6   H E L P E R #
+#########################
+
+class V6_http_server(HTTPServer):
+	# listen on ipv4 and ipv6
+	address_family = socket.AF_INET6
+
+
+
+
+
+###########
+# M A I N #
+###########
+
+if __name__ == "__main__":
+	## RUN V6 HTTP SERVER ##
+	# create new object
+	http_server = V6_http_server(("::", 11111), Handler_class)
+	
+	# run
+	http_server.serve_forever()
