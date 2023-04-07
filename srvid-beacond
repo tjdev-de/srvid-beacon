@@ -36,11 +36,7 @@ class Handler_class(BaseHTTPRequestHandler):
 		}
 		
 		# encode json response
-		json_string = json.dumps({
-			"version": srvid_beacon_version,
-			"type": "success",
-			"data": data
-		});
+		json_string = json.dumps(data);
 		
 		# respond
 		self.wfile.write(bytes(json_string, "utf-8"))
