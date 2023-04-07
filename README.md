@@ -24,7 +24,7 @@ Create srvid-beacon user:
 
 Set permissions on daemon file:
 ```console
-# chown :srvid-beacon srvid-beacon
+# chown :srvid-beacon srvid-beacond
 # chmod 654 srvid-beacond
 ```
 
