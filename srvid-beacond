@@ -5,6 +5,7 @@ srvid_beacon_version = "3.0.0"
 
 ## IMPORTS ##
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from datetime import datetime
 import socket
 import json
 
@@ -30,9 +31,24 @@ class Handler_class(BaseHTTPRequestHandler):
 		# get hostname
 		hostname = socket.gethostname()
 		
+		# get time info
+		time_now = datetime.now()
+		time_utc = datetime.utcnow()
+		
+		time_tz = time_now.astimezone()
+		time_utc_offset = time_tz.tzinfo.utcoffset(time_tz).total_seconds()
+		time_zone_name = time_tz.tzinfo.tzname(time_tz)
+		
 		# build data object
 		data = {
-			"hostname": hostname
+			"hostname": hostname,
+			
+			"time": {
+				"local": time_now.timestamp(),
+				"utc": time_utc.timestamp(),
+				"utc_offset": time_utc_offset,
+				"timezone": time_zone_name
+			}
 		}
 		
 		# encode json response
