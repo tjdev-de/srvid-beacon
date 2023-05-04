@@ -1,86 +1,54 @@
 #!/usr/bin/python3
-# srvid-beacon v3.1.0 | (c) 2023 tjdev.de | www.tjdev.de
-srvid_beacon_version = "3.1.0"
+# srvid-beacon v3.2.0 | (c) 2023 tjdev.de | www.tjdev.de
+srvid_beacon_version = "3.2.0"
 
 
 ## IMPORTS ##
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from datetime import datetime
+from aiohttp import web
 import socket
-import json
 
 
-
-
-
-#################################
-# R E Q U E S T   H A N D L E R #
-#################################
-
-class Handler_class(BaseHTTPRequestHandler):
-	def do_GET(self):
-		## HEADERS ##
-		self.send_response_only(200)
-		self.send_header("Server", "srvid-beacon v" + srvid_beacon_version)
-		self.send_header("Date", self.date_time_string())
-		self.send_header("Content-type", "application/json; charset=utf-8")
-		self.end_headers()
-		
-		
-		## BODY ##
-		# get hostname
-		hostname = socket.gethostname()
-		
-		# get time info
-		time_now = datetime.now()
-		time_utc = datetime.utcnow()
-		
-		time_tz = time_now.astimezone()
-		time_utc_offset = time_tz.tzinfo.utcoffset(time_tz).total_seconds()
-		time_zone_name = time_tz.tzinfo.tzname(time_tz)
-		
-		# build data object
-		data = {
-			"hostname": hostname,
-			
-			"time": {
-				"local": time_now.timestamp(),
-				"utc": time_utc.timestamp(),
-				"utc_offset": time_utc_offset,
-				"timezone": time_zone_name
-			}
-		}
-		
-		# encode json response
-		json_string = json.dumps(data);
-		
-		# respond
-		self.wfile.write(bytes(json_string, "utf-8"))
-
-
-
-
-
-#########################
-# I P V 6   H E L P E R #
-#########################
-
-class V6_http_server(HTTPServer):
-	# listen on ipv4 and ipv6
-	address_family = socket.AF_INET6
-
-
-
-
-
-###########
-# M A I N #
-###########
-
-if __name__ == "__main__":
-	## RUN V6 HTTP SERVER ##
-	# create new object
-	http_server = V6_http_server(("::", 11111), Handler_class)
+## MAIN ROUTE ##
+async def main(request):
+	# get hostname
+	hostname = socket.gethostname()
 	
-	# run
-	http_server.serve_forever()
+	# get time info
+	time_now = datetime.now()
+	time_utc = datetime.utcnow()
+	
+	time_tz = time_now.astimezone()
+	time_utc_offset = time_tz.tzinfo.utcoffset(time_tz).total_seconds()
+	time_zone_name = time_tz.tzinfo.tzname(time_tz)
+	
+	# build data object
+	data = {
+		"hostname": hostname,
+		
+		"time": {
+			"local": time_now.timestamp(),
+			"utc": time_utc.timestamp(),
+			"utc_offset": time_utc_offset,
+			"timezone": time_zone_name
+		}
+	}
+	
+	# send response
+	return web.json_response(
+		data=data,
+		headers={"Server": ("srvid-beacon v" + srvid_beacon_version)}
+	)
+
+
+## RUN WEBSERVER ##
+# get an app
+app = web.Application()
+
+# add routes
+app.add_routes([
+	web.view("/", main)
+])
+
+# run webserver
+web.run_app(app, host=None, port=11111)
