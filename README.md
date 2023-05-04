@@ -7,7 +7,8 @@ Pingable http endpoint for monitoring server uptime
 Install python3:
 ```console
 # apt update
-# apt install python3
+# apt install python3 python3-pip
+# pip3 install aiohttp
 ```
 
 Clone git repository:
